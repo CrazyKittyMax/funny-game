@@ -1,1 +1,3 @@
-# funny-game
+# funny game
+- snake 
+- 2048 game
