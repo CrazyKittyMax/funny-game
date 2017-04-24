@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            background-color: skyblue;
+            position: relative;
+            /*width: 50%;*/
+            /*min-width: 500px;*/
+            width: 500px;
+            margin: 40px auto;
+            min-width: 500px;
+            /*overflow: hidden;*/
+            padding: 20px 0 50px;
+        }
+
+        .current {
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .rate {
+            position: relative;
+            display: block;
+            margin-left: 50px;
+        }
+
+        .audio {
+            position: relative;
+            width: 400px;
+            left: 50%;
+            margin-left: -200px;
+        }
+
+        .btns {
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+
+            flex-direction: row;
+            flex-wrap: wrap;
+            /*margin-left: 50px;*/
+        }
+
+        .btn {
+            /*width: 100px;*/
+            /*height: 30px;*/
+            border-radius: 30px;
+            padding: 2px 10px;
+            /*border: none;*/
+            outline: none;
+            font: normal 14px/14px '微软雅黑';
+            float: left;
+            margin: 10px 10px;
+            transition: all 1s ease-in-out;
+
+        }
+
+        .btn:hover {
+            transform: scale(1.2);
+            /*transform: rotateY(360deg);*/
+        }
+
+        .ord {
+            overflow: hidden;
+        }
+
+        .orders {
+            float: right;
+            margin-right: 20px;
+        }
+
+        .list {
+            list-style: none;
+            /*display: inline-block;*/
+            /*margin-bottom: 50px;*/
+        }
+
+        .song {
+            margin: 5px 50px;
+        }
+
+        .song:hover {
+            /*background-color: skyblue;*/
+            text-shadow: 1px 1px 2px black,
+            -1px -1px 1px white;
+        }
+
+        .playing {
+            color: brown;
+            font: bolder 18px/18px 'microsoft yahei';
+        }
+    </style>
+</head>
+
+<body>
+<div class="box">
+    <span class="current">Alive.mp3</span>
+    <audio class="audio" src="../audio/Alive.mp3" controls=""></audio>
+    <span class="rate">rate:1</span>
+
+    <div class="btns">
+        <button class="btn btn1">play</button>
+        <button class="btn btn2">pause</button>
+        <button class="btn btn3">stop</button>
+        <button class="btn btn4">load</button>
+        <button class="btn btn5">speedup</button>
+        <button class="btn btn6">slowdown</button>
+        <button class="btn btn7">next</button>
+        <button class="btn btn8">previous</button>
+    </div>
+    <div class="ord">
+        <select name="orders" id="orders" class="orders">
+            <option value="order" class="order" selected>顺序播放</option>
+            <option value="single" class="order">单曲循环</option>
+            <option value="random" class="order">随机播放</option>
+        </select>
+    </div>
+    <ul class="list">
+        <li class="song playing"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+        <li class="song"></li>
+    </ul>
+</div>
+
+<script>
+    var srcs = [
+                'audio/Alive.mp3',
+                'audio/Bad Situation.mp3',
+                'audio/go_go_naruto!.mp3',
+                'audio/I said I\'m Naruto.mp3',
+                'audio/Morning.mp3',
+                'audio/Naruto - Sadness And Sorrow.MP3',
+                'audio/Naruto Main Theme.mp3',
+                'audio/Need to be Strong.mp3',
+                'audio/strong and strike.mp3'
+            ],
+            songIndex = 0,//歌曲序号
+            flag = 'order',//1 2 3  顺序，逆序，乱序
+            box = document.querySelector('.box'),
+            current = box.querySelector('.current'),
+            audio = box.querySelector('audio'),
+            rate = box.querySelector('.rate'),
+            lists = box.querySelector('.list')
+                    .querySelectorAll('li'),
+    //绑定按钮事件
+            btns = box.querySelector('.btns'),
+            btn1 = btns.children[0],
+            btn2 = btns.children[1],
+            btn3 = btns.children[2],
+            btn4 = btns.children[3],
+            btn5 = btns.children[4],
+            btn6 = btns.children[5],
+            btn7 = btns.children[6],
+            btn8 = btns.children[7],
+            orders = box.querySelector('.orders');
+
+
+    //初始化歌名列表,并绑定事件
+    for (var i = 0; i < srcs.length; i++) {
+        lists[i].index = i;
+        lists[i].innerHTML = srcs[i].slice(9);
+        lists[i].addEventListener('click', function () {
+            songIndex = this.index;
+            standardIndex(songIndex);
+            toggleByIndex(songIndex);
+        }, false);
+    }
+
+    //标准化歌曲序号
+    function standardIndex(index) {
+        songIndex = index > 8 ? 0 : index;
+        songIndex = index < 0 ? 8 : songIndex;
+    }
+
+    //根据下标来切歌
+    /**
+     * @param  {[type]}
+     * @return {[type]}
+     */
+    function toggleByIndex(index) {
+        audio.setAttribute('src', srcs[index]);
+        audio.load();
+        audio.play();
+        //歌曲变化时，切换选中的歌名
+        for (var i = 0; i < lists.length; i++) {
+            lists[i].classList.remove('playing');
+        }
+        lists[index].classList.add('playing');
+
+        current.innerHTML = srcs[index].slice(9);
+        // console.log('index:'+index);
+    }
+
+    //根据flag来决定下一次index的变化
+    /**
+     * @param  {[type]}
+     * @param  {[type]}
+     * @return {Function}
+     */
+    function next(flag, index) {
+        // audio.load();
+        switch (flag) {
+            case 'order':
+                return ++index;//顺序
+            case 'single':
+                return index;//单曲循环
+            case 'random':
+                return parseInt(Math.random() * 9);
+            default:
+                return 0;
+        }
+    }
+
+    //根据flag来决定上一次的index
+    function previous(flag, index) {
+        // audio.load();
+        switch (flag) {
+            case 'order':
+                return --index;//顺序
+            case 'single':
+                return index;//单曲循环
+            case 'random':
+                return parseInt(Math.random() * 9);
+            default:
+                return 0;
+        }
+    }
+
+    //当前歌曲结束时触发事件
+    audio.addEventListener('ended', function () {
+        songIndex = next(flag, songIndex);
+        standardIndex(songIndex);
+        toggleByIndex(songIndex);
+    }, false);
+
+
+    //播放
+    btn1.addEventListener('click', function () {
+        audio.play();
+    }, false);
+
+    //暂停
+    btn2.addEventListener('click', function () {
+        audio.pause();
+    }, false);
+
+    //结束
+    btn3.addEventListener('click', function () {
+        audio.load();
+        rate.innerHTML = 'rate:1';
+    }, false);
+
+    //重新载入
+    btn4.addEventListener('click', function () {
+        audio.load();
+        rate.innerHTML = 'rate:1';
+    }, false);
+
+    //加快播放速度
+    btn5.addEventListener('click', function () {
+        audio.playbackRate *= 2;
+        rate.innerHTML = 'rate:' + audio.playbackRate;
+    }, false);
+
+    //放慢播放速度
+    btn6.addEventListener('click', function () {
+        audio.playbackRate /= 2;
+        rate.innerHTML = 'rate:' + audio.playbackRate;
+    }, false);
+
+    //下一首
+    btn7.addEventListener('click', function () {
+        songIndex = next(flag, songIndex);
+        // console.log(songIndex);
+        standardIndex(songIndex);
+        // console.log(songIndex);
+        toggleByIndex(songIndex);
+        // console.log(songIndex);
+    }, false);
+
+    //上一首
+    btn8.addEventListener('click', function () {
+        songIndex = previous(flag, songIndex);
+        standardIndex(songIndex);
+        toggleByIndex(songIndex);
+    }, false);
+
+    //给播放顺序下拉框绑定事件
+    orders.addEventListener('change', function () {
+        // console.log(orders.value);
+        flag = orders.value;
+    }, false);
+
+</script>
+</body>
+</html>

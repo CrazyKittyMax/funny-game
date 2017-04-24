@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>3D球形照片墙</title>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		html{
+			/*transform-style: preserve-3d;*/
+			perspective:1000px;
+		}
+		body{
+			perspective:1000px;
+			/*perspective:400px;*/
+			transform: translateZ(-500px);
+			/*perspective-origin: 600px -300px;*/
+			height: 800px;
+			overflow: hidden;
+		}
+		.box{
+			width: 100px;
+			height: 70px;
+			position: absolute;
+			left: 50%;
+			margin-left: -50px;
+			top: 50%;
+			/*background: url(images/dog2.jpg) center/cover;*/
+			transform-style: preserve-3d;
+		}
+		.item{
+			height: 100%;
+			width: 100%;
+			position: absolute;
+			/*background: url(images/dog.gif) center/cover;*/
+			/*backface-visibility: hidden;*/
+			/*border-radius: 35px;*/
+			transition: all 1s 0.2s linear;
+		}
+		@keyframes movea{
+			from{}
+			to{
+				transform:rotateY(360deg);
+			}
+		}
+		.animationa{
+			animation: linear 32s 0s movea infinite;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="box animationa"></div>
+	<script>
+		var box = document.querySelector('.box'),
+			n = 18,
+			m = 12,
+			nDeg = 360 / n,
+			mDeg = 180 / m;
+
+		// //获取样式总表
+		// var sheets = document.styleSheets;
+		// var sheet = sheets[0];
+
+		for (var i = 0; i < m; i++) {
+			for (var j = 0; j < n; j++) {
+				var item = document.createElement('div');
+				box.appendChild(item);
+				item.classList.add('item');
+				item.style=
+					' transform:'
+					+ ' rotateY(' + nDeg * j + 'deg)'
+					+ ' rotateX(' + (-85 + mDeg * i) + 'deg)'
+					+ ' translateZ(400px)'
+					+ ' scale(' + 1 / (1 + Math.abs(-80 + mDeg * i) * 0.02) + ');'
+					+ ' background: url(images/'+(parseInt((i*n+j))%15+1)+'.jpg) center/cover;'
+					+ ' transition: all 2s 0s ease;';
+			}
+		}
+
+		//调整照片球体的位置
+		// setTimeout(function(){
+			scrollTo(0,100);
+		// },2000)
+
+		//添加鼠标滚轮事件
+		var items = box.querySelectorAll('.item');
+		document.addEventListener('mousewheel', function(e) {
+			// console.log(e.wheelDelta);//滚轮向下,放大,1;滚轮向上,缩小,-1
+			var n;
+			n = e.wheelDelta === -120 ? 1 : -1;
+			for (var i = 0; i < items.length; i++) {
+				var styleStr = items[i].style.transform, //获取transform属性
+
+					zNum = parseInt(styleStr.slice(styleStr.indexOf('translateZ') + 11)), //截取上一次的translateZ数值
+					zStr = styleStr.replace(/translateZ\(\d+px\)/, 'translateZ(' + parseInt(zNum * (1 + n / 10)) + 'px)'),
+					scaleNum = parseFloat(zStr.slice(zStr.indexOf('scale') + 6)),
+					targetStr = zStr.replace(/scale\(\d+(\.\d+)?\)/, 'scale(' + scaleNum * (1 + n / 15) + ')');
+
+				items[i].style.transform = targetStr;
+			}
+		}, false);
+		// var str='ffff(123)sss'.replace(/\(\d{3}\)/,'www');
+		// console.log(str);
+	</script>
+</body>
+</html>
